@@ -1,0 +1,57 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Blog{% endblock %}
+
+{% load static %}
+
+{% block content %}
+  <!-- Forma rudimentaría -- ini -->
+  {% comment %} {% for post in posts %} {% endcomment %}
+  <!-- Forma rudimentaría -- fin -->
+
+  <!-- Forma de Django para hacer consultas inversas -- ini -->
+
+  <!-- Esto tiene una limitación y es que solo se puede tener una relación a dos bandas 
+    con el mismo nombre genérico -->
+  {% comment %} {% for post in category.post_set.all %}  {% endcomment %}
+  
+  <!-- Para no tener la limitación hemos creado en models.py el campo: related_name="get_posts" -->
+  {% for post in category.get_posts.all %} 
+  
+  <!-- Forma de Django para hacer consultas inversas -- fin -->
+    <section class="page-section cta">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-9 mx-auto">
+            <div class="cta-innerv text-center rounded">
+              <h2 class="section-heading mb-5">
+                <!-- Para la fecha usaremos un Template Tag, como es un formato predeterminado 
+                  que ya existe, lo usaremos -->
+                <span class="section-heading-upper">{{post.published|date:"SHORT_DATE_FORMAT"}}</span>
+                <span class="section-heading-lower">{{post.title}}</span>
+              </h2>
+              <p class="mb-0">
+                <img class="mx-auto d-flex rounded img-fluid mb-3 mb-lg-0" src="{{post.image.url}}" alt="">
+              </p>
+              <!-- Para que django acepte los saltos de línea hay que usar un Template Tag -->
+              <p class="mb-0 mbt">{{post.content|linebreaks}}</p>
+              <p class="mb-0 mbt">
+                <span class="section-heading-under">Publicado por <em><b>{{post.author}}</b></em> en <em>
+                  <em>
+                    {% for category in post.categories.all %}
+                      <!-- Para no mostrar la coma "," en el último elemento usaremos un Template Tag. 
+                      Existe dos variables en un bucle for: forloop.first (para el primer elemento)
+                      y forloop.last (para el último elemento)-->
+                      <a href="{% url 'category' category.id %}" class="link">{{category.name}}</a>{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                  </em>
+                </span>
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  {% endfor %}
+{% endblock %}
